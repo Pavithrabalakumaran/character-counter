@@ -1,90 +1,69 @@
 import {Component} from 'react'
-import {v4} from 'uuid'
-import UserInput from '../UserInput'
-
-import {
-  BgContainer,
-  LeftPanel,
-  InfoCardTop,
-  Info,
-  userInputListItem,
-  CounterHeading,
-  RightPanel,
-  EmptyImage,
-  AddInputContainer,
-  Input,
-  AddInputButton,
-} from './styledComponents'
+import {v4 as uuidV4} from 'uuid'
+import Characters from '../Characters'
+import './index.css'
 
 class CharacterCounter extends Component {
-  state = {
-    userInputList: [],
-    userInput: '',
+  state = {nameInput: '', CharacterList: []}
+
+  onChangeInput = event => {
+    this.setState({nameInput: event.target.value})
   }
 
-  onAddUserInput = event => {
+  submitButton = event => {
     event.preventDefault()
-    const {userInput} = this.state
-    const newUserInput = {
-      id: v4(),
-      userEnteredInput: userInput,
-      userEnteredTextLength: userInput.length,
+    const {nameInput} = this.state
+    const count = nameInput.length
+    const newCharacterCounter = {
+      id: uuidV4(),
+      name: nameInput,
+      count,
     }
-
     this.setState(prevState => ({
-      userInputList: [...prevState.userInputList, newUserInput],
-      userInput: '',
+      nameInput: '',
+      CharacterList: [...prevState.CharacterList, newCharacterCounter],
     }))
   }
 
-  onChangeUserInput = event => {
-    this.setState({userInput: event.target.value})
-  }
-
-  renderUserInputs = () => {
-    const {userInputList} = this.state
-
-    return userInputList.length === 0 ? (
-      <EmptyImage
-        src="https://assets.ccbp.in/frontend/react-js/no-user-inputs-img.png"
-        alt="no user inputs"
-      />
-    ) : (
-      userInputList.map(eachItem => (
-        <UserInput key={eachItem.id} userInputDetails={eachItem} />
-      ))
-    )
-  }
-
   render() {
-    const {userInput} = this.state
-
+    const {CharacterList, nameInput} = this.state
+    const countsLength = CharacterList.length
     return (
-      <BgContainer>
-        <LeftPanel>
-          <InfoCardTop>
-            <Info>
-              Count the Characters like a
-              <br />
-              Boss...
-            </Info>
-          </InfoCardTop>
-          <userInputListItem>{this.renderUserInputs()}</userInputListItem>
-        </LeftPanel>
-
-        <RightPanel>
-          <CounterHeading>Character Counter</CounterHeading>
-          <AddInputContainer onSubmit={this.onAddUserInput}>
-            <Input
-              type="text"
-              onChange={this.onChangeUserInput}
-              value={userInput}
-              placeholder="Enter the Characters here"
-            />
-            <AddInputButton>Add</AddInputButton>
-          </AddInputContainer>
-        </RightPanel>
-      </BgContainer>
+      <div className="app-container">
+        <div className="character-count-card">
+          <div className="counts-card">
+            <h1 className="heading">Count the characters like a Boss...</h1>
+            <ul className="ul-counter">
+              {countsLength > 0 ? (
+                CharacterList.map(each => (
+                  <Characters Details={each} key={each.id} />
+                ))
+              ) : (
+                <img
+                  className="image"
+                  src="https://assets.ccbp.in/frontend/react-js/no-user-inputs-img.png"
+                  alt="no user inputs"
+                />
+              )}
+            </ul>
+          </div>
+          <div className="characters-inputs-card">
+            <h1 className="characters-heading">Character Counter</h1>
+            <form className="input-card" onSubmit={this.submitButton}>
+              <input
+                className="input"
+                type="text"
+                placeholder="Enter the Characters here"
+                onChange={this.onChangeInput}
+                value={nameInput}
+              />
+              <button className="button" type="submit">
+                Add
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     )
   }
 }
